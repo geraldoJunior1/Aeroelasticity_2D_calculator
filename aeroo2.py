@@ -281,13 +281,13 @@ class Ui_MainWindow(object):
         self.label_23.setText(_translate("MainWindow", "Control sup. beta (ยบ)"))
         self.label_22.setText(_translate("MainWindow", "Control sup. chord  (m)"))
         self.groupBox_2.setTitle(_translate("MainWindow", "Structure data"))
-        self.label_11.setText(_translate("MainWindow", "Freq. 2 (Hz)"))
-        self.label_9.setText(_translate("MainWindow", "Freq. 1 (Hz)"))
+        self.label_11.setText(_translate("MainWindow", "Freq. 2 - Torsion (Hz)"))
+        self.label_9.setText(_translate("MainWindow", "Freq. 1 - Bending (Hz)"))
         self.label_14.setText(_translate("MainWindow", "CG position (m)"))
-        self.label_8.setText(_translate("MainWindow", "Ka"))
+        self.label_8.setText(_translate("MainWindow", "Torsional stiffness (Kt)"))
         self.label_18.setText(_translate("MainWindow", "Mass unity"))
         self.label_15.setText(_translate("MainWindow", "EC position (m)"))
-        self.label_10.setText(_translate("MainWindow", "Kh"))
+        self.label_10.setText(_translate("MainWindow", "Flexural stiffness (Kh)"))
         self.groupBox_4.setTitle(_translate("MainWindow", "General data"))
         self.label_7.setText(_translate("MainWindow", "RHO (kg/m^2)"))
         self.label_2.setText(_translate("MainWindow", "CA position (m)"))
@@ -296,7 +296,7 @@ class Ui_MainWindow(object):
         self.label_5.setText(_translate("MainWindow", "aw coeff."))
         self.label_4.setText(_translate("MainWindow", "Wingspan (m)"))
         self.pushButton.setText(_translate("MainWindow", "Plot: v-g-f diagram"))
-        self.pushButton_2.setText(_translate("MainWindow", "Plot: Control eff."))
+        self.pushButton_2.setText(_translate("MainWindow", "Static Aeroelasticity"))
         self.groupBox.setTitle(_translate("MainWindow", "Plot"))
         self.checkBox.setText(_translate("MainWindow", "Alternative flutter method"))
         self.label_24.setText(_translate("MainWindow", "Frequency (Hz)"))
@@ -338,7 +338,7 @@ class Ui_MainWindow(object):
                     self.velminN = 0
                     self.textEdit_axismin.insertPlainText(str(self.velminN))
 
-        try:
+        if True:
 
             self.A= [None] * 17
             self.A[0] = self.textEdit_1.toPlainText()
@@ -369,8 +369,8 @@ class Ui_MainWindow(object):
                 e = float(self.A[i])
                 fileID.write("%s \n" % str(e))
             self.plot(aaa)
-        except: 
-            pass
+        #except: 
+        #    pass
 
 
     def lig(self,a,x):
@@ -396,24 +396,24 @@ class Ui_MainWindow(object):
             if self.outro != 0:
                 self.vel, self.amort1, self.vel2, self.amort2,self.vel1, self.freq1, self.vel12, self.freq2 = t2Dsol.autovalorcomplex(self.B[13], self.B[14], self.B[2], self.B[5], self.B[0], self.B[12],self.B[8], self.B[9], self.B[16])
             else:
-                self.vel, self.amort1, self.vel2, self.amort2,self.vel1, self.freq1, self.vel12, self.freq2 = t2Dsol.nestacionario(self.B[13], self.B[14], self.B[2], self.B[5], self.B[0], self.B[12],self.B[8], self.B[9])
+                self.vel, self.amort1, self.vel2, self.amort2,self.vel1, self.freq1, self.vel12, self.freq2 = t2Dsol.nestacionario(self.B[13], self.B[14], self.B[2], self.B[5], self.B[0],self.B[8], self.B[9],self.B[10], self.B[11])
 
         
             self.vel11=copy.deepcopy(self.vel)
             #self.vel11.append(0)
             self.vel22=copy.deepcopy(self.vel2)
             #self.vel22.append(0)
-            self.ax.plot(self.vel,self.freq1, color='red')
-            self.ax.plot(self.vel2,self.freq2, color='blue')
+            self.ax.scatter(self.vel,self.freq1, color='red',s=4)
+            self.ax.scatter(self.vel2,self.freq2, color='red',s=4)
             self.ax.set_xlim(self.velminN,self.velmaxX)
             self.ax.set_ylim(self.freqminN,self.freqmaxX)
-            self.ax.set_ylabel('Frequência (Hz)')
-            self.ax.set_title('Diagrama vgf')
+            self.ax.set_ylabel('Frequency (Hz)')
+            self.ax.set_title('Vgf diagram')
             self.ax.grid()
-            self.ax2.plot(self.vel11[2:],self.amort1[2:],color='red')
-            self.ax2.plot(self.vel22[2:],self.amort2[2:],color='blue')
-            self.ax2.set_xlabel('Velocidade (m/s)')
-            self.ax2.set_ylabel('Amortecimento')
+            self.ax2.scatter(self.vel11[2:],self.amort1[2:],color='red',s=4)
+            self.ax2.scatter(self.vel22[2:],self.amort2[2:],color='red',s=4)
+            self.ax2.set_xlabel('Velocity (m/s)')
+            self.ax2.set_ylabel('Damping')
             self.ax2.grid()
             self.ax2.set_xlim(self.velminN,self.velmaxX)
             self.ax2.set_ylim(self.amortminX,self.amortmaxX)
@@ -430,11 +430,11 @@ class Ui_MainWindow(object):
             for i in range(len(eff)):
                 eff[i]=eff[i]*100
             self.ax.plot(vel, eff, color ='black')
-            self.ax.set_title('Eficiência de comandos')
+            self.ax.set_title('Command efficiency')
             self.ax.set_xlim(left=0,right=None)
             self.ax.set_ylim(0,100)
-            self.ax.set_xlabel('Velocidade (m/s)')
-            self.ax.set_ylabel('Eficiência (%)')
+            self.ax.set_xlabel('Velocity (m/s)')
+            self.ax.set_ylabel('Efficiency (%)')
             self.ax.set_xlim(self.velminN,self.velmaxX)
             self.ax.set_ylim(0,100)
             
@@ -442,8 +442,8 @@ class Ui_MainWindow(object):
             except: pass
             a=str("{:.2f}".format(U_rev))
             c=str("{:.2f}".format(U_div))
-            b = 'Velocidade de reversão de controle:'+' '+a+' '+'m/s'
-            d = 'Velocidade de divergência:'+' '+c+' '+'m/s'
+            b = 'Control reversal speed:'+' '+a+' '+'m/s'
+            d = 'Divergency speed:'+' '+c+' '+'m/s'
             self.textBrowser.append(b)
             self.textBrowser.append(d)
             self.ax.grid()
